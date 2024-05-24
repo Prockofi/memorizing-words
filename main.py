@@ -3,9 +3,6 @@ from random import randint
 #Сложность 0 - 1
 mode = 0.8
 
-#Дотошность 0 - 1
-dotosh = 0.9
-
 def write_to_file(data: list) -> None:
     with open("dict.txt", "a", encoding="utf-8") as file:
         data = helper_1(data)
@@ -19,6 +16,10 @@ def get_data_from_file() -> list:
         data = data.split('\n')
         data = helper_2(data[1:])
     return data
+
+def clear_file() -> None:
+    with open("dict.txt", "w", encoding="utf-8") as file:
+        file.write("")
 
 def helper_1(array: list) -> list:
     result = []
@@ -36,10 +37,11 @@ def helper_2(array: list) -> list:
     return result
 
 def helper_3(ref_word: str, word: str) -> int:
-    errors = 0
-    #
-    # Тут нужно сравнить слова с использованием параметра дотошность
-    #
+    scope = 0
+    for char in word:
+        if char in ref_word:
+            scope += 1
+    return scope / len(ref_word)
 
 print("Это простая программа для запоминания слов")
 
@@ -53,10 +55,13 @@ while True:
         usage = []
         print("\nСейчас вам будет предложенно правильно ввести представленные слова\nЧтобы прекратить обучение введите - выход")
         while True:
+            if len(usage) == len(words):
+                usage = []
             while True:
-                x = randint(0, len(words))
+                x = randint(0, len(words) - 1)
                 if x not in usage:
                     break
+            usage.append(x)
             inp = input(f" > {words[x][0]}\n < ")
             if inp.lower() == "выход":
                 break
@@ -79,7 +84,14 @@ while True:
         if x.lower() == 'д' or x.lower() == "да":
             write_to_file(words)
     elif x == "3":
-        pass
+        words = get_data_from_file()
+        print("\nВыберите из списка слова, которые следует удалить: ")
+        for word in words:
+            print(f"{words.index(word) + 1}) {word}")
+        inp = input(" < ")
+        words.remove(words[int(inp) - 1])
+        clear_file()
+        write_to_file(words)
     elif x == "4":
         break
     
